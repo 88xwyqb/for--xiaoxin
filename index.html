@@ -5,13 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>给小辛</title>
+<title>给小江 · 我们的故事</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
     font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", -apple-system, sans-serif;
-    background: linear-gradient(165deg, #FFF3E6 0%, #FFE4CC 25%, #FFD4A8 55%, #FDDCB5 80%, #FFECD2 100%);
+    background: #F5EDE0;
     min-height: 100vh;
     min-height: 100dvh;
     display: flex;
@@ -19,12 +19,12 @@
     justify-content: center;
     overflow-x: hidden;
     -webkit-tap-highlight-color: transparent;
-    -webkit-user-select: none;
     user-select: none;
-    background-attachment: fixed;
+    -webkit-user-select: none;
+    perspective: 1200px;
   }
 
-  /* Warm grain overlay */
+  /* Paper texture overlay */
   body::after {
     content: '';
     position: fixed;
@@ -32,502 +32,507 @@
     width: 100%; height: 100%;
     pointer-events: none;
     z-index: 0;
-    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.028'/%3E%3C/svg%3E");
+  }
+
+  /* Book container */
+  .book {
+    position: relative;
+    z-index: 1;
+    width: 88vw;
+    max-width: 380px;
+    min-height: 520px;
+    transform-style: preserve-3d;
+    transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+  }
+
+  /* Page wrapper */
+  .page {
+    position: relative;
+    width: 100%;
+    min-height: 520px;
+    border-radius: 8px 18px 18px 8px;
+    padding: 40px 28px 36px;
+    box-shadow:
+      2px 4px 24px rgba(0,0,0,0.08),
+      0 1px 4px rgba(0,0,0,0.04);
+    overflow: hidden;
+    transition: background 1.2s ease;
+  }
+
+  /* Watercolor wash layers */
+  .wash-layer {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    transition: opacity 1.2s ease;
+  }
+
+  /* Watercolor blob effect */
+  .wc-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(40px);
+    opacity: 0.55;
+    transition: all 1.2s ease;
+  }
+
+  /* Page edge shadow (book spine side) */
+  .page::before {
+    content: '';
+    position: absolute;
+    left: -2px; top: 0;
+    width: 14px; height: 100%;
+    background: linear-gradient(90deg, rgba(0,0,0,0.06), rgba(0,0,0,0.02) 40%, transparent);
+    border-radius: 2px;
+    pointer-events: none;
+  }
+
+  /* Scene illustration area */
+  .scene {
+    position: relative;
+    width: 100%;
+    height: 220px;
+    margin: 0 auto 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .scene svg {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.06));
+  }
+
+  /* Hand-drawn style title for chapter */
+  .chapter-label {
+    text-align: center;
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    font-family: "Georgia", "Times New Roman", serif;
     opacity: 0.5;
   }
 
-  /* Floating elements */
-  .floating {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    pointer-events: none;
-    z-index: 0;
-  }
-  .float-item {
-    position: absolute;
-    opacity: 0.4;
-    animation: floatUp linear infinite;
-  }
-  @keyframes floatUp {
-    0%   { transform: translateY(105vh) rotate(0deg) scale(0.4); opacity: 0; }
-    8%   { opacity: 0.45; }
-    85%  { opacity: 0.35; }
-    100% { transform: translateY(-10vh) rotate(380deg) scale(1.05); opacity: 0; }
-  }
-
-  /* Card */
-  .card {
-    position: relative;
-    z-index: 1;
-    width: 90vw;
-    max-width: 380px;
-    background: rgba(255,255,250,0.5);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-radius: 32px;
-    padding: 32px 24px 28px;
-    box-shadow:
-      0 8px 48px rgba(200,140,80,0.15),
-      0 2px 8px rgba(200,140,80,0.06),
-      inset 0 1px 0 rgba(255,255,255,0.6);
+  .page-title {
+    font-size: 22px;
+    font-weight: 700;
     text-align: center;
-    cursor: pointer;
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
-    border: 1px solid rgba(255,220,180,0.4);
-  }
-  .card:active {
-    transform: scale(0.965);
-    box-shadow:
-      0 4px 20px rgba(200,140,80,0.12),
-      inset 0 1px 0 rgba(255,255,255,0.4);
+    letter-spacing: 3px;
+    margin-bottom: 16px;
+    font-family: "STKaiti", "KaiTi", "楷体", "PingFang SC", serif;
+    line-height: 1.4;
   }
 
-  /* Illustration */
-  .illustration {
-    position: relative;
-    width: 240px;
-    height: 240px;
-    margin: -8px auto 16px;
-    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* Message text */
+  .page-message {
+    font-size: 15px;
+    line-height: 2;
+    text-align: center;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    padding: 0 4px;
+    animation: textFadeIn 0.6s ease;
   }
-  .card.revealed .illustration {
-    transform: scale(0.68) translateY(-16px);
+  @keyframes textFadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
 
-  /* Sparkle effect on tap */
-  .sparkle-container {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    pointer-events: none;
+  /* Page number */
+  .page-num {
+    text-align: center;
+    font-size: 11px;
+    margin-top: 16px;
+    letter-spacing: 2px;
+    opacity: 0.4;
   }
+
+  /* Chapter divider */
+  .chapter-divider {
+    width: 30px;
+    height: 1px;
+    margin: 10px auto 16px;
+    opacity: 0.35;
+    transition: all 0.8s ease;
+  }
+
+  /* Sparkles */
   .sparkle {
     position: fixed;
     pointer-events: none;
     z-index: 999;
-    animation: sparklePop 0.8s ease-out forwards;
+    animation: sparkPop 0.7s ease-out forwards;
     opacity: 0;
   }
-  @keyframes sparklePop {
+  @keyframes sparkPop {
     0%   { opacity: 0; transform: scale(0) rotate(0deg); }
-    30%  { opacity: 1; transform: scale(1.3) rotate(20deg); }
-    100% { opacity: 0; transform: scale(0.3) rotate(90deg) translateY(-20px); }
+    25%  { opacity: 1; transform: scale(1.2) rotate(15deg); }
+    100% { opacity: 0; transform: scale(0.2) rotate(80deg) translateY(-24px); }
   }
 
-  .title {
-    font-size: 28px;
-    font-weight: 700;
-    color: #B86B3A;
-    margin-bottom: 4px;
-    letter-spacing: 4px;
-    transition: all 0.5s ease;
-  }
-  .card.revealed .title {
-    font-size: 19px;
-    margin-bottom: 0;
+  /* Book spine */
+  .spine {
+    position: absolute;
+    left: 0; top: 0;
+    width: 8px; height: 100%;
+    background: rgba(0,0,0,0.03);
+    border-radius: 4px 0 0 4px;
+    pointer-events: none;
   }
 
-  .subtitle {
-    font-size: 13px;
-    color: #C9936B;
-    margin-bottom: 12px;
-    letter-spacing: 2px;
-    font-weight: 500;
-  }
-
-  /* Tap hint */
-  .tap-hint {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 13px;
-    color: #D4A87C;
-    animation: gentleFloat 2.4s ease-in-out infinite;
-    margin-bottom: 2px;
-  }
-  .tap-hint .cookie {
-    display: inline-block;
-    animation: cookieBounce 1.4s ease-in-out infinite;
-    font-size: 15px;
-  }
-  .tap-hint .cookie:nth-child(2) { animation-delay: 0.18s; }
-  .tap-hint .cookie:nth-child(3) { animation-delay: 0.36s; }
-  @keyframes gentleFloat {
-    0%, 100% { opacity: 0.55; transform: translateY(0); }
-    50% { opacity: 1; transform: translateY(-4px); }
-  }
-  @keyframes cookieBounce {
-    0%, 100% { transform: translateY(0) scale(1); }
-    50% { transform: translateY(-6px) scale(1.15); }
-  }
-  .card.revealed .tap-hint {
-    animation: none;
-    opacity: 0.75;
-  }
-  .card.revealed .tap-hint-text {
-    font-size: 12px;
-  }
-
-  /* Message area */
-  .message-wrapper {
-    position: relative;
-    min-height: 70px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 6px;
-    transition: min-height 0.5s ease;
-  }
-  .card.revealed .message-wrapper {
-    min-height: 110px;
-  }
-
-  .message {
-    font-size: 16px;
-    line-height: 1.85;
-    color: #6B3A28;
-    font-weight: 500;
-    letter-spacing: 0.5px;
-    padding: 14px 6px;
-    animation: msgSlideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  @keyframes msgSlideIn {
-    from { opacity: 0; transform: translateY(14px) scale(0.96); }
-    to   { opacity: 1; transform: translateY(0) scale(1); }
-  }
-
-  .message-counter {
-    font-size: 11px;
-    color: #D4A88C;
-    margin-top: 4px;
-    letter-spacing: 1px;
-    opacity: 0;
-    transition: opacity 0.5s ease;
-  }
-  .card.revealed .message-counter {
-    opacity: 1;
-  }
-
-  /* Decorative line */
-  .deco-line {
-    width: 36px;
-    height: 2.5px;
-    background: linear-gradient(90deg, #F0C090, #E8A870, #F0C090);
-    border-radius: 2px;
-    margin: 0 auto 12px;
-    transition: width 0.5s ease;
-  }
-  .card.revealed .deco-line {
-    width: 56px;
-  }
-
-  /* Footer hint */
-  .footer-hint {
+  /* Bottom hint */
+  .bottom-hint {
     position: fixed;
-    bottom: max(16px, env(safe-area-inset-bottom));
+    bottom: max(14px, env(safe-area-inset-bottom));
     left: 50%;
     transform: translateX(-50%);
     z-index: 1;
     font-size: 11px;
-    color: #C99B76;
-    letter-spacing: 1.5px;
-    opacity: 0.6;
+    letter-spacing: 2px;
+    opacity: 0.45;
     pointer-events: none;
   }
 
-  /* Small screen adjustments */
   @media (max-width: 360px) {
-    .card { padding: 24px 16px 22px; }
-    .illustration { width: 200px; height: 200px; }
-    .title { font-size: 24px; }
-    .message { font-size: 15px; line-height: 1.75; }
-  }
-  @media (min-width: 420px) {
-    .illustration { width: 250px; height: 250px; }
+    .page { padding: 32px 18px 28px; min-height: 460px; }
+    .scene { height: 180px; }
+    .page-title { font-size: 19px; }
+    .page-message { font-size: 14px; line-height: 1.9; }
   }
 </style>
 </head>
 <body>
 
+<!-- Watercolor floating particles -->
 <div class="floating" id="floating"></div>
 
-<div class="card" id="card" onclick="showMessage(event)">
-  <div class="illustration">
-    <svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <radialGradient id="warmGlow" cx="50%" cy="35%" r="55%">
-          <stop offset="0%" stop-color="#FFF0E0" stop-opacity="0.7"/>
-          <stop offset="100%" stop-color="#FFE0C0" stop-opacity="0"/>
-        </radialGradient>
-        <radialGradient id="blushL" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#FF8A80" stop-opacity="0.45"/>
-          <stop offset="100%" stop-color="#FF8A80" stop-opacity="0"/>
-        </radialGradient>
-        <radialGradient id="blushR" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#FF8A80" stop-opacity="0.45"/>
-          <stop offset="100%" stop-color="#FF8A80" stop-opacity="0"/>
-        </radialGradient>
-        <linearGradient id="dressL" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#F8BBD0"/>
-          <stop offset="100%" stop-color="#F48FB1"/>
-        </linearGradient>
-        <linearGradient id="dressR" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#FFE0B2"/>
-          <stop offset="100%" stop-color="#FFCC80"/>
-        </linearGradient>
-      </defs>
+<div class="book" id="book" onclick="flipPage(event)">
+  <div class="spine"></div>
+  <div class="page" id="page">
+    <div class="wash-layer" id="washLayer"></div>
 
-      <!-- Background warm glow -->
-      <circle cx="120" cy="95" r="110" fill="url(#warmGlow)"/>
+    <div class="scene" id="scene"></div>
 
-      <!-- ===== LEFT GIRL (darker hair) ===== -->
-
-      <!-- Hair back left -->
-      <ellipse cx="88" cy="92" rx="40" ry="42" fill="#5D4037"/>
-      <rect x="50" y="92" width="22" height="58" rx="11" fill="#5D4037"/>
-      <!-- Hair back right -->
-      <rect x="106" y="88" width="16" height="55" rx="8" fill="#5D4037"/>
-
-      <!-- Body / Dress left -->
-      <path d="M58 125 Q50 155 54 195 L126 195 Q130 155 118 125 Z" fill="url(#dressL)"/>
-
-      <!-- Left girl face -->
-      <ellipse cx="90" cy="90" rx="32" ry="34" fill="#FDEBD0"/>
-
-      <!-- Bangs -->
-      <path d="M58 88 Q62 58 90 56 Q118 58 122 88" fill="#6D4C41"/>
-      <ellipse cx="90" cy="65" rx="30" ry="18" fill="#6D4C41"/>
-
-      <!-- Blush -->
-      <ellipse cx="70" cy="98" rx="10" ry="6" fill="url(#blushL)"/>
-      <ellipse cx="110" cy="98" rx="10" ry="6" fill="url(#blushL)"/>
-
-      <!-- Eyes - big cute style -->
-      <ellipse cx="74" cy="86" rx="7" ry="8.5" fill="#3E2723"/>
-      <ellipse cx="106" cy="86" rx="7" ry="8.5" fill="#3E2723"/>
-      <!-- Eye highlights -->
-      <circle cx="77" cy="82" r="3" fill="white"/>
-      <circle cx="72" cy="88" r="1.5" fill="white" opacity="0.7"/>
-      <circle cx="109" cy="82" r="3" fill="white"/>
-      <circle cx="104" cy="88" r="1.5" fill="white" opacity="0.7"/>
-
-      <!-- Happy eyebrow -->
-      <path d="M66 74 Q74 70 82 74" stroke="#4E342E" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-      <path d="M98 74 Q106 70 114 74" stroke="#4E342E" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-
-      <!-- Smile -->
-      <path d="M82 102 Q90 112 98 102" stroke="#E8957A" stroke-width="2.2" fill="#E8957A" fill-opacity="0.2" stroke-linecap="round"/>
-
-      <!-- ===== RIGHT GIRL (lighter hair) ===== -->
-
-      <!-- Hair back right -->
-      <ellipse cx="152" cy="88" rx="38" ry="40" fill="#8D6E63"/>
-      <rect x="132" y="88" width="18" height="52" rx="9" fill="#8D6E63"/>
-      <rect x="168" y="84" width="15" height="50" rx="8" fill="#8D6E63"/>
-
-      <!-- Body / Dress right -->
-      <path d="M126 122 Q118 152 122 192 L190 192 Q194 152 182 122 Z" fill="url(#dressR)"/>
-
-      <!-- Right girl face -->
-      <ellipse cx="152" cy="86" rx="30" ry="32" fill="#FEE4CD"/>
-
-      <!-- Bangs -->
-      <path d="M122 84 Q126 54 152 52 Q178 54 182 84" fill="#A1887F"/>
-      <ellipse cx="152" cy="61" rx="28" ry="17" fill="#A1887F"/>
-
-      <!-- Flower hair clip -->
-      <circle cx="176" cy="66" r="7" fill="#F8BBD0"/>
-      <circle cx="173" cy="63" r="4.5" fill="#F48FB1"/>
-      <circle cx="179" cy="63" r="4.5" fill="#F48FB1"/>
-      <circle cx="174.5" cy="60" r="4.5" fill="#FCE4EC"/>
-      <circle cx="177.5" cy="60" r="4.5" fill="#FCE4EC"/>
-      <circle cx="176" cy="62.5" r="2.5" fill="#FFF176"/>
-
-      <!-- Blush -->
-      <ellipse cx="134" cy="94" rx="9" ry="5.5" fill="url(#blushR)"/>
-      <ellipse cx="170" cy="94" rx="9" ry="5.5" fill="url(#blushR)"/>
-
-      <!-- Eyes - big cute style -->
-      <ellipse cx="138" cy="82" rx="6.5" ry="8" fill="#3E2723"/>
-      <ellipse cx="166" cy="82" rx="6.5" ry="8" fill="#3E2723"/>
-      <!-- Eye highlights -->
-      <circle cx="141" cy="78" r="2.8" fill="white"/>
-      <circle cx="136" cy="84" r="1.3" fill="white" opacity="0.7"/>
-      <circle cx="169" cy="78" r="2.8" fill="white"/>
-      <circle cx="164" cy="84" r="1.3" fill="white" opacity="0.7"/>
-
-      <!-- Happy eyebrow -->
-      <path d="M130 70 Q138 66 146 70" stroke="#5D4037" stroke-width="2" fill="none" stroke-linecap="round"/>
-      <path d="M158 70 Q166 66 174 70" stroke="#5D4037" stroke-width="2" fill="none" stroke-linecap="round"/>
-
-      <!-- Smile (bigger) -->
-      <path d="M144 98 Q152 109 160 98" stroke="#E8957A" stroke-width="2.2" fill="#E8957A" fill-opacity="0.2" stroke-linecap="round"/>
-
-      <!-- ===== ARMS HUGGING ===== -->
-      <!-- Left arm wrapping behind right girl -->
-      <path d="M118 128 Q135 120 145 125" stroke="#FDEBD0" stroke-width="12" fill="none" stroke-linecap="round"/>
-      <!-- Right arm wrapping behind left girl -->
-      <path d="M126 125 Q110 118 98 122" stroke="#FEE4CD" stroke-width="11" fill="none" stroke-linecap="round"/>
-
-      <!-- ===== DECORATIVE ELEMENTS ===== -->
-
-      <!-- Big heart between them -->
-      <text x="108" y="118" font-size="22" fill="#EF5350" opacity="0.55">♥</text>
-
-      <!-- Small floating hearts -->
-      <text x="56" y="46" font-size="12" fill="#FF8A80" opacity="0.5">♥</text>
-      <text x="172" y="42" font-size="10" fill="#FF80AB" opacity="0.5">♥</text>
-      <text x="48" y="148" font-size="9" fill="#FF8A80" opacity="0.4">♥</text>
-      <text x="178" y="150" font-size="11" fill="#FF80AB" opacity="0.45">♥</text>
-
-      <!-- Small sparkles -->
-      <text x="60" y="68" font-size="10" fill="#FFD54F" opacity="0.6">✦</text>
-      <text x="172" y="54" font-size="9" fill="#FFD54F" opacity="0.55">✦</text>
-      <text x="42" y="120" font-size="8" fill="#FFD54F" opacity="0.45">✦</text>
-      <text x="188" y="130" font-size="7" fill="#FFD54F" opacity="0.5">✦</text>
-
-      <!-- Tiny flower near bottom -->
-      <text x="96" y="180" font-size="11" fill="#F48FB1" opacity="0.5">🌸</text>
-      <text x="140" y="178" font-size="9" fill="#FFCC80" opacity="0.5">🌼</text>
-    </svg>
+    <div class="chapter-label" id="chapterLabel"></div>
+    <div class="page-title" id="pageTitle"></div>
+    <div class="chapter-divider" id="divider"></div>
+    <div class="page-message" id="pageMessage"></div>
+    <div class="page-num" id="pageNum"></div>
   </div>
-
-  <div class="deco-line"></div>
-  <div class="title">给 小 辛</div>
-  <div class="subtitle">— 三年高中好友 · 一起买花拍照 —</div>
-
-  <div class="tap-hint">
-    <span class="cookie">🍪</span>
-    <span class="cookie">🍊</span>
-    <span class="cookie">🍬</span>
-    <span class="tap-hint-text">点 一 下 · 有 话 给 你</span>
-    <span class="cookie">🍬</span>
-    <span class="cookie">🍊</span>
-    <span class="cookie">🍪</span>
-  </div>
-
-  <div class="message-wrapper" id="messageWrapper"></div>
-  <div class="message-counter" id="counter"></div>
 </div>
 
-<div class="footer-hint">📱 收藏起来 · 随时打开看看</div>
+<div class="bottom-hint" id="bottomHint">翻 开 下 一 页</div>
 
 <script>
-const messages = [
-  "小辛，还记得高中时我们一起去花店吗？🌸<br>你总说我挑的花最好看，其实是因为和你在一起，什么花都变得特别美。",
-  "好想念你奶奶做的红烧肉啊！🍖<br>那是我吃过全世界最好吃的红烧肉，每次去你家都要吃两大碗饭，你奶奶还总说\"多吃点多吃点\"。",
-  "翻看我们高中一起拍的照片，📸<br>每一张都是青春里最甜的样子。和你一起合照的每一个瞬间，都是我最珍贵的宝藏。",
-  "高中三年，最幸运的事就是遇见你。💕<br>一起逛街、一起买花、一起在操场上晒太阳聊八卦，每一个普通的日子因为有你都变得闪闪发光。",
-  "还记得在你家阳台聊天到天黑吗？🌙<br>你奶奶在厨房里做红烧肉，香味飘上来，那时候觉得，这就是最温暖的人间烟火。",
-  "不管以后我们去到哪里，✨<br>你永远是我最好的朋友。三年很短很短，但我们的友谊一定会很长很长很长。",
-  "小辛，谢谢你陪我走过整个高中。💝<br>那些一起哭过笑过的日子，是我心里最柔软最温暖的那一块。",
-  "下次回去，第一件事就是去你家！🏠<br>我要吃你奶奶做的红烧肉，要和你一起拍照，要像以前那样在你房间里聊到半夜。",
-  "还记得我们一起去买花的那条街吗？🌷<br>你抱着一大束花走在前面，我就在后面偷拍你，那张照片我现在还留着。",
-  "你是我见过最温暖的人，🌻<br>像春天的花、夏天的风、秋天的落叶、冬天的暖阳。认识你，真的很幸福。",
-  "高中毕业不是终点，💗<br>我们的故事还会一直一直写下去。小辛，很高兴认识你，更高兴这么多年一直有你。",
-  "有时候想起高中的事就忍不住笑，😂<br>我们在课堂上偷偷传纸条、下课一起去小卖部、周末约着出去玩……那些日子真的太美好了。",
-  "小辛，你知道吗？🌟<br>每次别人问我最好的朋友是谁，我都会毫不犹豫地说你的名字。从高中到现在，从来没变过。",
-  "我在你家吃过无数顿饭，🍚<br>你奶奶的红烧肉、糖醋排骨、番茄炒蛋……每一样都是家的味道。谢谢你们一家人对我的好。",
-  "我们一起去过的那些地方，🏞️<br>一起拍过的那些照片，一起笑过的那些瞬间，都是我青春里最美的印记。小辛，有你真好。"
+// === Data: 18 pages in 5 chapters ===
+var chapters = [
+  { name: '第一章 · 初见', color: '#F2C9A4', wcColors: ['#F5D5B8','#F0C098','#FAD8B8','#E8B888'], label: 'CHAPTER ONE · BEGINNING' },
+  { name: '第二章 · 靠近', color: '#B8C9A0', wcColors: ['#CDD8B8','#B8C898','#C5D5A8','#A8C088'], label: 'CHAPTER TWO · CONNECTION' },
+  { name: '第三章 · 感动', color: '#E8B8B8', wcColors: ['#F0C8C8','#E8B8B8','#F0D0D0','#D8A8A8'], label: 'CHAPTER THREE · TOUCHED' },
+  { name: '第四章 · 陪伴', color: '#B8C8D8', wcColors: ['#C8D8E8','#B8C8D8','#C0D0E0','#A8B8C8'], label: 'CHAPTER FOUR · TOGETHER' },
+  { name: '第五章 · 现在', color: '#D8C098', wcColors: ['#E0D0B0','#D8C098','#E8D8B8','#C8B088'], label: 'CHAPTER FIVE · NOW' }
 ];
 
-let shownMessages = [];
-let revealed = false;
+var pages = [
+  { ch:0, title:'第一张小纸条', msg:'' },
+  { ch:0, title:'悄悄搭一座桥', msg:'' },
+  { ch:0, title:'我只是不想放弃', msg:'' },
+  { ch:0, title:'那扇门推开了一点', msg:'' },
+  { ch:1, title:'迷茫时的一封信', msg:'' },
+  { ch:1, title:'"你不是一个人"', msg:'' },
+  { ch:1, title:'和你聊天不用怕', msg:'' },
+  { ch:1, title:'你比我还懂我', msg:'' },
+  { ch:2, title:'晚自习的纸条', msg:'' },
+  { ch:2, title:'陪着我一点一点想通', msg:'' },
+  { ch:2, title:'我知道你在就很安心', msg:'' },
+  { ch:2, title:'还好你接住了', msg:'' },
+  { ch:3, title:'铁盒里的信', msg:'' },
+  { ch:3, title:'沉默也不尴尬', msg:'' },
+  { ch:3, title:'信任的重量', msg:'' },
+  { ch:3, title:'谁也拆不掉的桥', msg:'' },
+  { ch:4, title:'你是那个让我找到线头的人', msg:'' },
+  { ch:4, title:'踏实的感觉没变过', msg:'' }
+];
+
+var fullMessages = [
+  '高一那年第一次注意到你，<br>你话不多，安静地坐在那里。<br>我也不知道哪来的勇气，<br>递过去了第一张小纸条。<br>后来你告诉我，<br>那张纸条你一直收着。',
+
+  '我们从小纸条开始，<br>慢慢地到写很长的信。<br>每天交换纸条成了习惯，<br>像两个人在悄悄搭一座桥——<br>一座只有我们知道的桥。',
+
+  '一开始你不太容易靠近，<br>对人有种礼貌的距离感。<br>但我能感觉到你有很多话没说，<br>我就一直写一直写，<br>就是想让你知道：有人在。',
+
+  '有一次你在信里说了心里话，<br>说感谢我一直没有放弃。<br>我看到那句话的时候眼眶红了，<br>不是因为难过——<br>是你终于愿意推开那扇门了。',
+
+  '高二那段时间我很迷茫，<br>不知道自己在干嘛、要去哪里。<br>每次乱成一团的时候就给你写信，<br>好像把理不清的想法写在纸上，<br>你就能帮我理清楚。',
+
+  '你回过我一封信，<br>里面有一句话我记到今天。<br>你说"你不是一个人"。<br>就这几个字，<br>我在被窝里看了好多遍，<br>哭了很久——是终于有人懂了。',
+
+  '小江，你有一种很特别的能力：<br>不管我说什么奇怪的话、<br>问什么不着边际的问题，<br>你都不会让我觉得难堪。<br>和你聊天永远不用怕说错话。',
+
+  '你的情商真的很高，<br>聊天时总能稳稳地接住我。<br>有时我连自己想表达什么都不知道，<br>你却能把话说得刚刚好——<br>好像你比我还了解我自己。',
+
+  '高中大家忙着刷题考试，<br>我们却在晚自习的间隙传纸条。<br>那些小纸条是我一天里最期待的事，<br>比任何分数都让人安心，<br>比任何排名都来得真实。',
+
+  '后来上大学了、忙各自的事了，<br>但遇到想不通的问题，<br>我还是习惯性地想到你。<br>你没有告诉我要怎么做，<br>而是陪着我一点一点地想通。<br>这种感觉真的很珍贵。',
+
+  '从高一同班到现在，好几年了。<br>身边的人来来走走，<br>但你一直都没有离开。<br>不是每天聊不停的陪伴，<br>是那种——我知道你在，就很安心。',
+
+  '有时候我会想，<br>如果高一那天我没有递出第一张纸条，<br>我们是不是就擦肩而过了。<br>还好当时我没有犹豫，<br>还好你接住了。',
+
+  '你给我写的那些信和纸条，<br>我都好好地收在一个铁盒里。<br>偶尔翻出来看，<br>字迹都有点泛黄了，<br>但每一个字的分量都还在。',
+
+  '小江，最好的朋友就是——<br>不用刻意找话题也能舒服地待着。<br>你就是这样的人。<br>沉默的时候不尴尬，<br>说话时又能说到心坎里。',
+
+  '谢谢你愿意信任我，<br>愿意把柔软的那一面给我看。<br>我知道这对你来说不容易，<br>所以我会格外珍惜这份信任，<br>一直一直都在意。',
+
+  '我们用纸条和信，<br>慢慢地描出了彼此的轮廓。<br>那些文字像是一块一块的砖，<br>一块一块地铺，<br>最后垒成了谁也拆不掉的桥。',
+
+  '小江，你是特别特别好的人。<br>可能你自己不太这么觉得，<br>但在我这里，<br>你是那个能让我从一团乱麻里<br>找到线头的人。',
+
+  '以前写信给你的时候，<br>总觉得把心里的话写出来就踏实了。<br>现在虽然不写信了，<br>但每次和你聊完天，<br>那种踏实的感觉还是一样的。没变过。'
+];
+
+// Chapter SVG scenes (hand-drawn style)
+var chapterScenes = {};
+
+// Chapter 0: 初见 - Two figures exchanging a note
+chapterScenes[0] = '<svg viewBox="0 0 280 200" xmlns="http://www.w3.org/2000/svg">'
+  + '<defs><filter id="sketch0"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2" xChannelSelector="R" yChannelSelector="G"/></filter></defs>'
+  + '<g filter="url(#sketch0)" opacity="0.85">'
+  + '<circle cx="85" cy="70" r="22" fill="none" stroke="#8B6F5E" stroke-width="1.5" stroke-dasharray="3 1.5"/>'
+  + '<circle cx="85" cy="70" r="18" fill="#F5E0C8" opacity="0.4"/>'
+  + '<ellipse cx="85" cy="72" rx="4" ry="2.5" fill="none" stroke="#8B6F5E" stroke-width="1" opacity="0.6"/>'
+  + '<circle cx="195" cy="65" r="22" fill="none" stroke="#8B6F5E" stroke-width="1.5" stroke-dasharray="3 1.5"/>'
+  + '<circle cx="195" cy="65" r="18" fill="#F5E0C8" opacity="0.4"/>'
+  + '<ellipse cx="195" cy="67" rx="4" ry="2.5" fill="none" stroke="#8B6F5E" stroke-width="1" opacity="0.6"/>'
+  + '<line x1="105" y1="75" x2="175" y2="68" stroke="#C8A888" stroke-width="1.2" stroke-dasharray="6 3"/>'
+  + '<rect x="125" y="58" width="22" height="16" rx="1" fill="#FFFBF5" stroke="#C8A888" stroke-width="0.9" transform="rotate(-8 136 66)"/>'
+  + '<line x1="130" y1="63" x2="142" y2="62" stroke="#C8A888" stroke-width="0.5" opacity="0.6"/>'
+  + '<line x1="130" y1="67" x2="140" y2="66" stroke="#C8A888" stroke-width="0.5" opacity="0.6"/>'
+  + '<text x="115" y="130" font-size="10" fill="#C8A888" opacity="0.55" font-family="serif">&#x2665;</text>'
+  + '<text x="158" y="128" font-size="8" fill="#C8A888" opacity="0.4" font-family="serif">&#x2665;</text>'
+  + '</g></svg>';
+
+// Chapter 1: 靠近 - Open book/letter with light
+chapterScenes[1] = '<svg viewBox="0 0 280 200" xmlns="http://www.w3.org/2000/svg">'
+  + '<defs><filter id="sketch1"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2" xChannelSelector="R" yChannelSelector="G"/></filter></defs>'
+  + '<g filter="url(#sketch1)" opacity="0.85">'
+  + '<path d="M70 50 Q140 42 210 50" stroke="#6B8B5E" stroke-width="1.3" fill="none" stroke-dasharray="4 2"/>'
+  + '<path d="M80 55 L90 120 L140 110 L190 120 L200 55" fill="#F0F5E8" stroke="#8B9B78" stroke-width="1.1" opacity="0.7"/>'
+  + '<line x1="100" y1="70" x2="180" y2="68" stroke="#8B9B78" stroke-width="0.6" opacity="0.5"/>'
+  + '<line x1="100" y1="80" x2="175" y2="78" stroke="#8B9B78" stroke-width="0.6" opacity="0.5"/>'
+  + '<line x1="102" y1="90" x2="170" y2="88" stroke="#8B9B78" stroke-width="0.6" opacity="0.5"/>'
+  + '<line x1="105" y1="100" x2="160" y2="99" stroke="#8B9B78" stroke-width="0.6" opacity="0.5"/>'
+  + '<circle cx="140" cy="60" r="14" fill="none" stroke="#C8B888" stroke-width="0.8" opacity="0.6"/>'
+  + '<circle cx="140" cy="60" r="10" fill="#FFF8D8" opacity="0.4"/>'
+  + '<text x="140" y="65" text-anchor="middle" font-size="13" fill="#C8A858" opacity="0.55" font-family="serif">&#x2606;</text>'
+  + '<text x="75" y="150" font-size="9" fill="#8B9B78" opacity="0.45" font-family="serif">&#x273F;</text>'
+  + '<text x="195" y="148" font-size="8" fill="#8B9B78" opacity="0.4" font-family="serif">&#x273F;</text>'
+  + '</g></svg>';
+
+// Chapter 2: 感动 - Heart / warm tears
+chapterScenes[2] = '<svg viewBox="0 0 280 200" xmlns="http://www.w3.org/2000/svg">'
+  + '<defs><filter id="sketch2"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2" xChannelSelector="R" yChannelSelector="G"/></filter></defs>'
+  + '<g filter="url(#sketch2)" opacity="0.85">'
+  + '<path d="M140 40 Q160 28 175 48 Q188 68 168 82 Q148 96 140 96 Q132 96 112 82 Q92 68 105 48 Q120 28 140 40Z" fill="#F0D0D0" stroke="#C88888" stroke-width="1.2" opacity="0.6"/>'
+  + '<circle cx="128" cy="62" r="6" fill="none" stroke="#C88888" stroke-width="0.8" opacity="0.5"/>'
+  + '<circle cx="152" cy="62" r="6" fill="none" stroke="#C88888" stroke-width="0.8" opacity="0.5"/>'
+  + '<path d="M132 72 Q140 78 148 72" stroke="#C88888" stroke-width="0.9" fill="none" stroke-linecap="round" opacity="0.6"/>'
+  + '<circle cx="140" cy="58" r="18" fill="none" stroke="#E8C8C8" stroke-width="0.7" opacity="0.5"/>'
+  + '<circle cx="140" cy="58" r="14" fill="none" stroke="#E8C8C8" stroke-width="0.6" opacity="0.4"/>'
+  + '<text x="100" y="130" font-size="11" fill="#C88888" opacity="0.45" font-family="serif">&#x2665;</text>'
+  + '<text x="170" y="128" font-size="9" fill="#C88888" opacity="0.4" font-family="serif">&#x2665;</text>'
+  + '<text x="140" y="150" font-size="8" fill="#D8A8A8" opacity="0.35" font-family="serif">&#x2726;</text>'
+  + '</g></svg>';
+
+// Chapter 3: 陪伴 - Two figures side by side
+chapterScenes[3] = '<svg viewBox="0 0 280 200" xmlns="http://www.w3.org/2000/svg">'
+  + '<defs><filter id="sketch3"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2" xChannelSelector="R" yChannelSelector="G"/></filter></defs>'
+  + '<g filter="url(#sketch3)" opacity="0.85">'
+  + '<circle cx="95" cy="65" r="18" fill="none" stroke="#6B7B8E" stroke-width="1.3" stroke-dasharray="3 2"/>'
+  + '<ellipse cx="95" cy="67" rx="3" ry="2" fill="none" stroke="#6B7B8E" stroke-width="0.9" opacity="0.6"/>'
+  + '<circle cx="185" cy="63" r="18" fill="none" stroke="#6B7B8E" stroke-width="1.3" stroke-dasharray="3 2"/>'
+  + '<ellipse cx="185" cy="65" rx="3" ry="2" fill="none" stroke="#6B7B8E" stroke-width="0.9" opacity="0.6"/>'
+  + '<line x1="95" y1="82" x2="95" y2="120" stroke="#6B7B8E" stroke-width="1" stroke-dasharray="4 2" opacity="0.5"/>'
+  + '<line x1="185" y1="80" x2="185" y2="120" stroke="#6B7B8E" stroke-width="1" stroke-dasharray="4 2" opacity="0.5"/>'
+  + '<circle cx="140" cy="110" r="28" fill="none" stroke="#A8B8D8" stroke-width="0.8" stroke-dasharray="2 4" opacity="0.4"/>'
+  + '<text x="140" y="114" text-anchor="middle" font-size="12" fill="#8B9BB8" opacity="0.4" font-family="serif">&#x223C;</text>'
+  + '<text x="80" y="150" font-size="9" fill="#8B9BB8" opacity="0.35" font-family="serif">&#x2726;</text>'
+  + '<text x="190" y="148" font-size="8" fill="#8B9BB8" opacity="0.35" font-family="serif">&#x2726;</text>'
+  + '</g></svg>';
+
+// Chapter 4: 现在 - Single envelope with warmth
+chapterScenes[4] = '<svg viewBox="0 0 280 200" xmlns="http://www.w3.org/2000/svg">'
+  + '<defs><filter id="sketch4"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2" xChannelSelector="R" yChannelSelector="G"/></filter></defs>'
+  + '<g filter="url(#sketch4)" opacity="0.85">'
+  + '<rect x="95" y="58" width="90" height="62" rx="3" fill="#FFFBF5" stroke="#B09880" stroke-width="1.1" opacity="0.7"/>'
+  + '<path d="M95 62 L140 100 L185 62" fill="#F5EDDD" stroke="#B09880" stroke-width="1.1" stroke-linejoin="round" opacity="0.7"/>'
+  + '<circle cx="140" cy="82" r="11" fill="none" stroke="#C89878" stroke-width="1" opacity="0.6"/>'
+  + '<circle cx="140" cy="82" r="8" fill="#E8C8B0" opacity="0.3"/>'
+  + '<text x="140" y="87" text-anchor="middle" font-size="11" fill="#C88060" opacity="0.55" font-family="serif">&#x2665;</text>'
+  + '<circle cx="140" cy="82" r="26" fill="none" stroke="#D8C0A0" stroke-width="0.6" stroke-dasharray="2 3" opacity="0.35"/>'
+  + '<circle cx="140" cy="82" r="22" fill="none" stroke="#D8C0A0" stroke-width="0.5" stroke-dasharray="2 3" opacity="0.3"/>'
+  + '<text x="85" y="150" font-size="8" fill="#C0A880" opacity="0.4" font-family="serif">&#x2726;</text>'
+  + '<text x="188" y="148" font-size="9" fill="#C0A880" opacity="0.4" font-family="serif">&#x2726;</text>'
+  + '</g></svg>';
+
+var currentPage = -1; // -1 = cover
+var pageOrder = null;
 
 function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
   }
   return a;
 }
 
-let shuffled = shuffle(messages);
-let index = 0;
+function resetPageOrder() {
+  pageOrder = [];
+  for (var i = 0; i < pages.length; i++) { pageOrder.push(i); }
+  pageOrder = shuffle(pageOrder);
+}
+
+resetPageOrder();
 
 function spawnSparkles(x, y) {
-  const card = document.getElementById('card');
-  const emojis = ['✨','💫','🌟','⭐','💛'];
-
-  for (let i = 0; i < 7; i++) {
-    const spark = document.createElement('span');
+  var emojis = ['✨','💫','⭐','✉','💌'];
+  for (var i = 0; i < 8; i++) {
+    var spark = document.createElement('span');
     spark.className = 'sparkle';
     spark.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-    spark.style.left = (x + (Math.random() - 0.5) * 80) + 'px';
-    spark.style.top = (y + (Math.random() - 0.5) * 60) + 'px';
-    spark.style.fontSize = (8 + Math.random() * 14) + 'px';
-    spark.style.animationDuration = (0.5 + Math.random() * 0.7) + 's';
-    spark.style.animationDelay = Math.random() * 0.12 + 's';
+    spark.style.left = (x + (Math.random() - 0.5) * 100) + 'px';
+    spark.style.top = (y + (Math.random() - 0.5) * 70) + 'px';
+    spark.style.fontSize = (9 + Math.random() * 16) + 'px';
+    spark.style.animationDuration = (0.5 + Math.random() * 0.8) + 's';
+    spark.style.animationDelay = Math.random() * 0.15 + 's';
     document.body.appendChild(spark);
-    setTimeout(() => spark.remove(), 1000);
+    setTimeout(function() { spark.remove(); }, 1000);
   }
 }
 
-function showMessage(event) {
-  const card = document.getElementById('card');
-  const wrapper = document.getElementById('messageWrapper');
-  const counter = document.getElementById('counter');
+function applyWatercolor(chapter) {
+  var ch = chapters[chapter];
+  var wash = document.getElementById('washLayer');
+  var colors = ch.wcColors;
 
-  if (event) {
-    spawnSparkles(event.clientX, event.clientY);
+  // Create watercolor blobs
+  var blobs = '';
+  for (var i = 0; i < 4; i++) {
+    var size = 140 + Math.random() * 80;
+    var x = 20 + Math.random() * 60;
+    var y = 15 + Math.random() * 70;
+    var opacity = 0.35 + Math.random() * 0.25;
+    blobs += '<div class="wc-blob" style="width:' + size + 'px;height:' + size + 'px;'
+      + 'left:' + x + '%;top:' + y + '%;'
+      + 'background:' + colors[i] + ';opacity:' + opacity + ';"></div>';
   }
-
-  if (!revealed) {
-    card.classList.add('revealed');
-    revealed = true;
-  }
-
-  if (index >= shuffled.length) {
-    shuffled = shuffle(messages);
-    index = 0;
-    shownMessages = [];
-  }
-
-  const msg = shuffled[index];
-  shownMessages.push(msg);
-  index++;
-
-  wrapper.style.opacity = '0';
-  wrapper.style.transform = 'translateY(8px)';
-  wrapper.style.transition = 'opacity 0.12s ease, transform 0.12s ease';
-
-  setTimeout(() => {
-    wrapper.innerHTML = `<div class="message">${msg}</div>`;
-    wrapper.style.opacity = '1';
-    wrapper.style.transform = 'translateY(0)';
-  }, 150);
-
-  counter.textContent = `共 ${messages.length} 句心里话 · 点击继续`;
+  wash.innerHTML = blobs;
 }
 
-// Generate floating food items
+function showPage(pageIndex, event) {
+  var chIdx = pages[pageIndex].ch;
+  var ch = chapters[chIdx];
+
+  // Flip animation
+  var book = document.getElementById('book');
+  book.style.transform = 'rotateY(-5deg)';
+  setTimeout(function() {
+    book.style.transform = 'rotateY(0deg)';
+  }, 350);
+
+  // Update watercolor
+  applyWatercolor(chIdx);
+
+  // Update content
+  document.getElementById('chapterLabel').textContent = ch.label;
+  document.getElementById('pageTitle').textContent = pages[pageIndex].title;
+  document.getElementById('pageMessage').innerHTML = fullMessages[pageIndex];
+  document.getElementById('pageNum').textContent = '· ' + (pageIndex + 1) + ' / ' + pages.length + ' ·';
+
+  // Chapter colors
+  document.getElementById('chapterLabel').style.color = ch.color;
+  document.getElementById('pageTitle').style.color = ch.color;
+  document.getElementById('divider').style.background = ch.color;
+  document.getElementById('pageMessage').style.color = ch.color;
+
+  // Scene
+  document.getElementById('scene').innerHTML = chapterScenes[chIdx];
+
+  document.getElementById('bottomHint').textContent = '点 击 翻 开 下 一 页';
+}
+
+function showCover() {
+  currentPage = -1;
+  var book = document.getElementById('book');
+  book.style.transform = 'rotateY(0deg)';
+
+  // Warm amber cover
+  applyWatercolor(4);
+
+  document.getElementById('chapterLabel').textContent = '';
+  document.getElementById('pageTitle').textContent = '给 小 江';
+  document.getElementById('pageTitle').style.color = '#8B6F5E';
+  document.getElementById('pageMessage').innerHTML = '从纸条到信件<br>从高一到现在<br><br><span style="font-size:13px;opacity:0.6;">点 击 翻 开</span>';
+  document.getElementById('pageMessage').style.color = '#8B6F5E';
+  document.getElementById('pageNum').textContent = '';
+  document.getElementById('divider').style.background = '#8B6F5E';
+  document.getElementById('chapterLabel').style.color = '#8B6F5E';
+
+  // Cover scene - decorated envelope
+  document.getElementById('scene').innerHTML = chapterScenes[4];
+
+  document.getElementById('bottomHint').textContent = '翻 开 我 们 的 故 事';
+}
+
+function flipPage(event) {
+  if (event) { spawnSparkles(event.clientX, event.clientY); }
+
+  if (pageOrder.length === 0) { resetPageOrder(); }
+
+  currentPage++;
+  if (currentPage >= pageOrder.length) {
+    currentPage = 0;
+    resetPageOrder();
+  }
+
+  showPage(pageOrder[currentPage], event);
+}
+
+// Initialize
+showCover();
+
+// Floating elements
 (function() {
-  const container = document.getElementById('floating');
-  const items = [
-    { emoji: '🍊', size: [14, 26] },
-    { emoji: '🍪', size: [12, 22] },
-    { emoji: '🍓', size: [13, 24] },
-    { emoji: '🍰', size: [15, 26] },
-    { emoji: '🍑', size: [14, 24] },
-    { emoji: '🌸', size: [10, 18] },
-    { emoji: '🍬', size: [10, 20] },
-    { emoji: '💛', size: [9, 16] },
-  ];
-
-  for (let i = 0; i < 20; i++) {
-    const item = items[Math.floor(Math.random() * items.length)];
-    const el = document.createElement('span');
-    el.className = 'float-item';
-    el.textContent = item.emoji;
+  var container = document.getElementById('floating');
+  if (!container) return;
+  var items = ['✿','❀','✦','◻','~','○'];
+  for (var i = 0; i < 18; i++) {
+    var el = document.createElement('span');
+    el.style.cssText = 'position:absolute;opacity:0.22;animation:floatUp linear infinite;pointer-events:none;';
+    el.textContent = items[Math.floor(Math.random() * items.length)];
     el.style.left = (Math.random() * 94) + '%';
-    el.style.fontSize = (item.size[0] + Math.random() * (item.size[1] - item.size[0])) + 'px';
-    el.style.animationDuration = (12 + Math.random() * 18) + 's';
-    el.style.animationDelay = (Math.random() * 14) + 's';
+    el.style.fontSize = (8 + Math.random() * 14) + 'px';
+    el.style.animationDuration = (14 + Math.random() * 20) + 's';
+    el.style.animationDelay = (Math.random() * 16) + 's';
+    el.style.color = ['#C8B898','#B8C8A8','#D8B8B8','#A8B8C8','#C8A888'][Math.floor(Math.random()*5)];
     container.appendChild(el);
   }
 })();
 </script>
+
+<style>
+  @keyframes floatUp {
+    0%   { transform: translateY(108vh) rotate(0deg) scale(0.3); opacity: 0; }
+    6%   { opacity: 0.25; }
+    88%  { opacity: 0.2; }
+    100% { transform: translateY(-8vh) rotate(360deg) scale(1); opacity: 0; }
+  }
+</style>
 </body>
 </html>
